@@ -1,20 +1,19 @@
 import { Canvas } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, Environment } from "@react-three/drei";
 import ModeloLaboratorio6 from "../components/ModeloLaboratorio6";
 
-function LaboratorioEjercicio6() {
+export default function LaboratorioEjercicio6() {
   return (
-    <div style={{ width: "100%", height: "80vh" }}>
-      <Canvas dpr={1} camera={{ position: [8, 5, 10], fov: 45 }}>
-        <ambientLight intensity={0.8} />
-        <directionalLight position={[5, 10, 5]} intensity={1.2} />
-
-        <ModeloLaboratorio6 />
-
-        <OrbitControls />
-      </Canvas>
-    </div>
+    <Canvas
+      className="position-absolute w-100 h-100"
+      style={{ position: "fixed", width: "100vw", height: "100vh" }}
+      camera={{ position: [10, 5, 10], fov: 40 }}
+    >
+      <ambientLight intensity={1} />
+      <directionalLight position={[5, 20, 5]} intensity={1.2} />
+      <Environment preset="city" />
+      <ModeloLaboratorio6 />
+      <OrbitControls enableRotate={true} />
+    </Canvas>
   );
 }
-
-export default LaboratorioEjercicio6;

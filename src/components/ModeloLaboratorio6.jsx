@@ -1,78 +1,60 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 import { useLoader } from "@react-three/fiber";
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import * as THREE from "three";
+import { VideoTexture } from "three";
 
-function ModeloLaboratorio6() {
-  const gltf = useLoader(GLTFLoader, "/assets/LivingRoom.glb");
+export default function ModeloLaboratorio6() {
+  const gltf = useLoader(GLTFLoader, "/assets/living_room.glb");
   const modelRef = useRef();
-  const audioRef = useRef(new Audio("/assets/sonido.mp3"));
   const videoRef = useRef(document.createElement("video"));
+  const audioRef = useRef(new Audio("/assets/ambiente.mp3"));
   const [audioActivo, setAudioActivo] = useState(false);
 
   useEffect(() => {
     if (!gltf) return;
 
-    // Configuración del audio
-    audioRef.current.loop = true;
-
-    // Configuración del video
+  
     videoRef.current.src = "/assets/video.mp4";
     videoRef.current.crossOrigin = "anonymous";
     videoRef.current.loop = true;
     videoRef.current.muted = true;
-    videoRef.current.playsInline = true;
+    videoRef.current.play();
+    const videoTexture = new VideoTexture(videoRef.current);
 
-    const videoTexture = new THREE.VideoTexture(videoRef.current);
-    videoTexture.flipY = false;
-    videoTexture.needsUpdate = true;
-
-    // Recorremos todo el modelo para encontrar la pantalla
     gltf.scene.traverse((child) => {
       if (child.isMesh) {
-        console.log("Objeto encontrado:", child.name);
 
-        if (child.name === "mesh1755818725_1") {
+        if (child.name === "Cube011_Cube025-Mesh_1") {
           child.material = child.material.clone();
           child.material.map = videoTexture;
           child.material.needsUpdate = true;
-
-          console.log("Video aplicado a la pantalla:", child.name);
         }
+        console.log("🔹 Objeto encontrado:", child.name);
       }
     });
 
-    // Reproducir el video
-    videoRef.current.play().catch((error) => {
-      console.error("Error al reproducir video:", error);
-    });
-
-    return () => {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-
-      videoRef.current.pause();
-      videoRef.current.currentTime = 0;
-    };
+    audioRef.current.loop = true;
   }, [gltf]);
 
   const handleClick = (event) => {
     event.stopPropagation();
     const clickedObject = event.object.name;
-    console.log("Objeto clickeado:", clickedObject);
+    console.log("🖱️ Click en:", clickedObject);
 
-    const nombreObjetoSonido = "group265941632";
+    const objetosSonoros = [
+      "Cube008_Cube019-Mesh",
+      "Cube008_Cube019-Mesh_1"
+    ];
 
-    if (clickedObject === nombreObjetoSonido) {
+    if (objetosSonoros.includes(clickedObject)) {
       if (audioRef.current.paused) {
-        audioRef.current.play().catch((error) => {
-          console.error("Error al reproducir audio:", error);
-        });
+        audioRef.current.play().catch((error) =>
+          console.error("❌ Error al reproducir audio:", error)
+        );
         setAudioActivo(true);
-        console.log("🔊 Audio activado");
+        console.log("🎵 Audio activado");
       } else {
         audioRef.current.pause();
-        audioRef.current.currentTime = 0;
         setAudioActivo(false);
         console.log("🔇 Audio detenido");
       }
@@ -83,11 +65,9 @@ function ModeloLaboratorio6() {
     <primitive
       ref={modelRef}
       object={gltf.scene}
-      scale={1.5}
-      position={[0, -1, 0]}
+      scale={1}
+      position={[2.9, -1, 0]}
       onPointerDown={handleClick}
     />
   );
 }
-
-export default ModeloLaboratorio6;
